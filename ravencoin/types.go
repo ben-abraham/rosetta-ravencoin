@@ -79,9 +79,9 @@ const (
 // Fee estimate constants
 // Source: https://bitcoinops.org/en/tools/calc-size/
 const (
-	MinFeeRate                  = float64(0.015) // nolint:gomnd
+	MinFeeRate                  = float64(0.010) // nolint:gomnd
 	TransactionOverhead         = 12             // 4 version, 2 segwit flag, 1 vin, 1 vout, 4 lock time
-	InputSize                   = 68             // 4 prev index, 32 prev hash, 4 sequence, 1 script size, ~27 script witness
+	InputSize                   = 148            // 4 prev index, 32 prev hash, 4 sequence, 1 script size, ~107 script witness
 	OutputOverhead              = 9              // 8 value, 1 script size
 	P2PKHScriptPubkeySize       = 25             // P2PKH size
 	P2PKHReplayScriptPubkeySize = 63             // P2PKH size with replay protection
