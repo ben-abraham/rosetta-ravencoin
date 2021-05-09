@@ -7,15 +7,13 @@
    Rosetta Ravencoin
 </h3>
 <p align="center">
-  <a href="https://circleci.com/gh/RavenProject/rosetta-ravencoin/tree/master"><img src="https://circleci.com/gh/RavenProject/rosetta-ravencoin/tree/master.svg?style=shield" /></a>
-  <a href="https://coveralls.io/github/RavenProject/rosetta-ravencoin"><img src="https://coveralls.io/repos/github/RavenProject/rosetta-ravencoin/badge.svg" /></a>
   <a href="https://goreportcard.com/report/github.com/RavenProject/rosetta-ravencoin"><img src="https://goreportcard.com/badge/github.com/RavenProject/rosetta-ravencoin" /></a>
   <a href="https://github.com/RavenProject/rosetta-ravencoin/blob/master/LICENSE.txt"><img src="https://img.shields.io/github/license/RavenProject/rosetta-ravencoin.svg" /></a>
   <a href="https://pkg.go.dev/github.com/RavenProject/rosetta-ravencoin?tab=overview"><img src="https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=shield" /></a>
 </p>
 
 <p align="center"><b>
-ROSETTA-BITCOIN IS CONSIDERED <a href="https://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha">ALPHA SOFTWARE</a>.
+ROSETTA-RAVENCOIN IS CONSIDERED <a href="https://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha">ALPHA SOFTWARE</a>.
 USE AT YOUR OWN RISK! COINBASE ASSUMES NO RESPONSIBILITY NOR LIABILITY IF THERE IS A BUG IN THIS IMPLEMENTATION.
 </b></p>
 
