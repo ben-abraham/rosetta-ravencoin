@@ -16,6 +16,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -24,11 +25,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/coinbase/rosetta-bitcoin/bitcoin"
-	"github.com/coinbase/rosetta-bitcoin/configuration"
-	"github.com/coinbase/rosetta-bitcoin/indexer"
-	"github.com/coinbase/rosetta-bitcoin/services"
-	"github.com/coinbase/rosetta-bitcoin/utils"
+	"github.com/RavenProject/rosetta-ravencoin/configuration"
+	"github.com/RavenProject/rosetta-ravencoin/indexer"
+	"github.com/RavenProject/rosetta-ravencoin/ravencoin"
+	"github.com/RavenProject/rosetta-ravencoin/services"
+	"github.com/RavenProject/rosetta-ravencoin/utils"
 
 	"github.com/coinbase/rosetta-sdk-go/asserter"
 	"github.com/coinbase/rosetta-sdk-go/server"
@@ -55,6 +56,7 @@ const (
 
 var (
 	signalReceived = false
+	disablePruning = false
 )
 
 // handleSignals handles OS signals so we can ensure we close database
@@ -79,15 +81,15 @@ func startOnlineDependencies(
 	cancel context.CancelFunc,
 	cfg *configuration.Configuration,
 	g *errgroup.Group,
-) (*bitcoin.Client, *indexer.Indexer, error) {
-	client := bitcoin.NewClient(
-		bitcoin.LocalhostURL(cfg.RPCPort),
+) (*ravencoin.Client, *indexer.Indexer, error) {
+	client := ravencoin.NewClient(
+		ravencoin.LocalhostURL(cfg.RPCPort),
 		cfg.GenesisBlockIdentifier,
 		cfg.Currency,
 	)
 
 	g.Go(func() error {
-		return bitcoin.StartBitcoind(ctx, cfg.ConfigPath, g)
+		return ravencoin.StartRavend(ctx, cfg.ConfigPath, g)
 	})
 
 	i, err := indexer.Initialize(
@@ -104,14 +106,21 @@ func startOnlineDependencies(
 		return i.Sync(ctx)
 	})
 
-	g.Go(func() error {
-		return i.Prune(ctx)
-	})
-
+	if !disablePruning {
+		g.Go(func() error {
+			return i.Prune(ctx)
+		})
+	}
 	return client, i, nil
 }
 
 func main() {
+	disablePruningFlag := flag.Bool("disable-pruning", false, "disable block pruning, default: false")
+	flag.Parse()
+	if *disablePruningFlag {
+		disablePruning = true
+	}
+
 	loggerRaw, err := zap.NewDevelopment()
 	if err != nil {
 		log.Fatalf("can't initialize zap logger: %v", err)
@@ -134,6 +143,7 @@ func main() {
 	}
 
 	logger.Infow("loaded configuration", "configuration", types.PrintStruct(cfg))
+	logger.Infow("Test Log!")
 
 	g, ctx := errgroup.WithContext(ctx)
 
@@ -142,7 +152,7 @@ func main() {
 	})
 
 	var i *indexer.Indexer
-	var client *bitcoin.Client
+	var client *ravencoin.Client
 	if cfg.Mode == configuration.Online {
 		client, i, err = startOnlineDependencies(ctx, cancel, cfg, g)
 		if err != nil {
@@ -153,7 +163,7 @@ func main() {
 	// The asserter automatically rejects incorrectly formatted
 	// requests.
 	asserter, err := asserter.NewServer(
-		bitcoin.OperationTypes,
+		ravencoin.OperationTypes,
 		services.HistoricalBalanceLookup,
 		[]*types.NetworkIdentifier{cfg.Network},
 		nil,
@@ -197,10 +207,10 @@ func main() {
 	}
 
 	if signalReceived {
-		logger.Fatalw("rosetta-bitcoin halted")
+		logger.Fatalw("rosetta-ravencoin halted")
 	}
 
 	if err != nil {
-		logger.Fatalw("rosetta-bitcoin sync failed", "error", err)
+		logger.Fatalw("rosetta-ravencoin sync failed", "error", err)
 	}
 }
